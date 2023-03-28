@@ -1,0 +1,26 @@
+from django.db.models import Q
+from webapp.models import *
+from datetime import timedelta
+from django.utils import timezone
+
+
+1)Закрытые задачи за последний месяц от текущей даты (вхождение определяйте по дате последнего обновления).
+
+end_date = timezone.now()
+start_date = end_date - timedelta(days=30)
+Task.objects.filter(status__name='Done', updated_at__range=(start_date, end_date))
+
+2)Задачи, имеющие один из указанных статусов И один из указанных типов (в запросе укажите 2 любых названия типа и 2
+ названия статуса, которые есть в вашей базе).
+
+ tasks = Task.objects.filter(status__name__in=['New', 'Done'], type__name__in=['Bug', 'Task'])
+ tasks
+
+3)Задачи, в названии которых содержится слово "bug" в любом регистре или относящиеся к типу "Баг",
+ имеющие НЕ закрытый статус.
+
+tasks = Task.objects.filter(Q(summary__icontains='bug') | Q(type__name__iexact='Баг')).exclude(status__name='Done')
+tasks
+
+Типы и Статусы были уже заранее добавлены, и при выводе в shell, выводятся поля webapp.Type.None и webapp.Status.None
+
